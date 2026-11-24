@@ -11,9 +11,9 @@ const links = [
 export default function Sidebar() {
   return (
     <aside className="sidebar">
-      <NavLink className="brand" to="/" aria-label="Daymark dashboard">
+      <NavLink className="brand" to="/" aria-label="SkillPath dashboard">
         <span className="brand-mark"><BookOpenCheck size={20} /></span>
-        <span><strong>daymark</strong><small>LEARNING SPACE</small></span>
+        <span><strong>SkillPath</strong><small>LEARNING SPACE</small></span>
       </NavLink>
       <div className="sidebar-label">WORKSPACE</div>
       <nav className="sidebar-nav" aria-label="Main navigation">
