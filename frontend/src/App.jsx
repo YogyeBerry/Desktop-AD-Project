@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { HashRouter, Route, Routes } from 'react-router-dom'
 import AppLayout from './components/AppLayout'
 import { LearningProvider } from './context/LearningProvider'
 import Analytics from './pages/Analytics'
@@ -13,7 +13,7 @@ import './App.css'
 export default function App() {
   return (
     <LearningProvider>
-      <BrowserRouter>
+      <HashRouter>
         <Routes>
           <Route element={<AppLayout />}>
             <Route index element={<Dashboard />} />
@@ -25,7 +25,7 @@ export default function App() {
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
     </LearningProvider>
   )
 }

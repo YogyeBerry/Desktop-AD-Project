@@ -8,10 +8,55 @@
     "electron": "electron .",
     "start:frontend": "npm run dev --prefix frontend",
     "start:backend": "npm run start --prefix backend",
-    "build:frontend": "npm run build --prefix frontend"
+    "build:frontend": "npm run build --prefix frontend",
+    "build:backend": "npm run prisma:generate --prefix backend",
+    "build": "npm run build:frontend && npm run build:backend",
+    "pack": "npm run build && electron-builder --dir",
+    "dist": "npm run build && electron-builder"
+  },
+  "build": {
+    "appId": "com.skillpath.desktop",
+    "productName": "SkillPath",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "package.json",
+      "frontend/dist/**/*",
+      "backend/server.js",
+      "backend/.env.example",
+      "backend/dev.db",
+      "backend/src/**/*",
+      "backend/prisma/**/*",
+      "backend/node_modules/**/*"
+    ],
+    "asar": true,
+    "asarUnpack": [
+      "**/node_modules/.prisma/**",
+      "**/node_modules/@prisma/**"
+    ],
+    "mac": {
+      "category": "public.app-category.education",
+      "target": [
+        "dir"
+      ]
+    },
+    "win": {
+      "target": [
+        "dir"
+      ]
+    },
+    "linux": {
+      "target": [
+        "dir"
+      ]
+    }
   },
   "devDependencies": {
     "concurrently": "^10.0.7",
-    "electron": "^45.0.0"
+    "electron": "^45.0.0",
+    "electron-builder": "^26.18.0"
   }
 }
