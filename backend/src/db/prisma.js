@@ -1,6 +1,11 @@
+const path = require('path');
 const { PrismaClient } = require('@prisma/client');
 
-const dbUrl = process.env.DATABASE_URL || 'file:./dev.db';
+let dbUrl = process.env.DATABASE_URL;
+if (!dbUrl) {
+  const defaultDbPath = path.resolve(__dirname, '../../prisma/dev.db');
+  dbUrl = `file:${defaultDbPath}`;
+}
 
 const prisma = new PrismaClient({
   datasources: {

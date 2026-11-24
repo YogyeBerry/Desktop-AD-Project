@@ -1,268 +1,220 @@
 # SkillPath — Personal Learning Path & Analytics Dashboard
 
-**A desktop application to organize learning resources, track study time, and visualize personal learning progress.**
+**A modern, production-ready desktop application for students to organize educational resources, track focused study time with a persistent timer, and visualize learning analytics.**
 
-SkillPath is a student-focused desktop application that helps learners create structured learning paths, organize educational resources, track study sessions, and monitor their progress.
+SkillPath is a student-only desktop application built with **Electron, React 19, Node.js, Express.js, Prisma ORM, and SQLite**, with rich data visualization powered by **Recharts**.
 
-Built using React, Electron, Node.js, Express.js, SQLite, and Prisma, SkillPath provides a centralized workspace for managing personal learning goals and understanding how time is spent across different topics.
+---
 
-## 🎯 Problem Statement
+## 🎯 Key Capabilities & Features
 
-Students often use multiple platforms and scattered resources to learn new skills. Organizing materials, following a structured plan, tracking time spent on individual topics, and measuring progress can be challenging.
+### 1. 📊 Student Dashboard
+- **Learning Overview Cards**: Instant insights on total paths, total topics, completed topics, and total focused study minutes.
+- **"Continue Learning" Feed**: Jump straight back into in-progress paths with progress meters and quick links to the next incomplete topic.
+- **Recent Study Activity**: Persistent log of your latest study sessions recorded by the timer.
+- **Quick Actions**: One-click shortcuts to create paths, browse curriculum, or import resources.
 
-SkillPath addresses this problem by providing a single desktop application where students can create learning paths, access learning materials, record study sessions, and view learning analytics.
+### 2. 🗺️ Learning Path Management
+- **Full CRUD Support**: Create, customize, edit, and delete structured learning paths.
+- **Dynamic Filtering & Search**: Instant client-side search by path title and description, with status filters (*All*, *In Progress*, *Completed*, *Not Started*).
+- **Progress Tracking**: Real-time progress bar recalculations based on completed topic records in SQLite.
 
-## ✨ Features
+### 3. 📝 Structured Topic Management
+- **Topic Breakdown**: Organize paths into sequential topics with custom descriptions and estimated completion durations (in minutes).
+- **Topic Study View**: A dedicated, distraction-free study space for each topic with focus prompts and next/previous topic navigation.
+- **Instant Completion Toggle**: Mark topics complete or incomplete with single-click persistence.
 
-### 1. Student Dashboard
-- View all personal learning paths.
-- See overall learning progress.
-- Track total study time.
-- View recently studied topics.
-- Identify completed and pending topics.
+### 4. ⏱️ Timestamp-Based Study Timer
+- **High-Accuracy Timing**: Uses real timestamps rather than volatile setInterval counters to ensure precision.
+- **Lifecycle Controls**: Start, Pause, Resume, and Stop & Save sessions.
+- **Crash & Interruption Recovery**: If the application closes unexpectedly, active sessions are automatically detected on next launch with options to Resume, Save, or Discard.
+- **Session History**: Completed study durations are logged as persistent `StudySession` records associated with the topic.
 
-### 2. Learning Path Management
-- Create, edit, and delete personal learning paths.
-- Add topics to each learning path.
-- Set estimated completion times for topics.
-- Organize learning resources under relevant topics.
-- Track completion status for individual topics.
+### 5. 📚 Educational Resource Management & CSV Import
+- **Multi-Type Resources**: Attach Websites, Video Tutorials, PDF references, and Documents to any topic.
+- **Safe External Link Handling**: External URLs open securely in the system default browser via Electron's shell API.
+- **Bulk CSV Import**: Import resources in bulk with a built-in CSV parser, automatic column validation, duplicate detection, and preview table. Supports downloading a sample CSV template directly from the app.
 
-### 3. Learning Resource Management
-- Attach links to educational videos and websites.
-- Store references to PDFs and documents.
-- Open learning materials from the relevant topic.
-- Keep learning resources organized by learning path.
+### 6. 📈 Visual Analytics & Insights (Recharts)
+- **Weekly Study Time Chart**: Daily bar chart of focused minutes across the past 7 days.
+- **Estimated vs. Actual Duration Chart**: Side-by-side comparison of planned durations versus actual studied minutes.
+- **Time by Learning Path**: Distribution of attention across different subjects.
+- **Path Completion Summary**: Overall goal attainment percentages calculated dynamically from SQLite.
 
-### 4. Study Time Tracking
-- Start, pause, and resume a study timer.
-- Track time spent on individual topics.
-- Save study sessions to the local database.
-- View total study time for each topic and learning path.
+---
 
-### 5. Learning Analytics
-- Display completion percentages for learning paths.
-- Compare completed and pending topics.
-- Visualize time spent on different topics.
-- View total learning time.
-- Compare actual study time with estimated topic duration.
+## 🛠️ Technology Stack
 
-### 6. Resource Import
-- Import learning-resource records from CSV files.
-- Organize imported resources and associate them with relevant topics.
-
-CSV import will be implemented after the core application works. Direct Excel and BibTeX support may be added later if time permits.
-
-## 🛠️ Tech Stack
-
-| Technology | Purpose |
-|---|---|
-| React | Build the user interface |
-| JavaScript | Frontend and backend programming |
-| Electron | Build the desktop application |
-| Node.js | Run the backend |
-| Express.js | Create REST API endpoints |
-| SQLite | Store application data locally |
-| Prisma ORM | Define database models and execute queries |
-| Vite | Frontend development and build tooling |
-| Tailwind CSS | Style the interface |
-| Recharts | Display analytics charts, if needed |
-
-## 🏗️ Application Architecture
-
-SkillPath follows a layered architecture that separates the desktop interface, backend API, and database.
-
-```text
-┌──────────────────────────────┐
-│       Electron Desktop       │
-│                              │
-│         React + Vite         │
-│       Student Interface      │
-└──────────────┬───────────────┘
-               │
-               │ HTTP / REST API
-               ▼
-┌──────────────────────────────┐
-│       Node.js + Express      │
-│                              │
-│          API Routes          │
-│         Controllers          │
-│         Business Logic       │
-└──────────────┬───────────────┘
-               │
-               ▼
-┌──────────────────────────────┐
-│          Prisma ORM          │
-└──────────────┬───────────────┘
-               │
-               ▼
-┌──────────────────────────────┐
-│            SQLite            │
-│       Local Data Storage     │
-└──────────────────────────────┘
-```
-
-- **Electron** provides the desktop window and application lifecycle.
-- **React** renders the student interface.
-- **Express.js** handles API requests and application logic.
-- **Prisma** manages database operations.
-- **SQLite** stores learning paths, topics, resources, progress, and study sessions.
-
-## 📂 Project Structure
-
-```text
-skillpath/
-├── electron/
-│   ├── main.js
-│   └── preload.js
-│
-├── client/
-│   ├── index.html
-│   ├── package.json
-│   ├── vite.config.js
-│   └── src/
-│       ├── components/
-│       ├── pages/
-│       ├── services/
-│       ├── hooks/
-│       ├── App.jsx
-│       ├── App.css
-│       └── main.jsx
-│
-├── server/
-│   ├── package.json
-│   └── src/
-│       ├── routes/
-│       ├── controllers/
-│       ├── services/
-│       ├── middleware/
-│       └── app.js
-│
-├── prisma/
-│   └── schema.prisma
-│
-├── package.json
-└── README.md
-```
-
-All application code will use JavaScript with `.js` and `.jsx` extensions. No TypeScript or `.cjs` files are required.
-
-## 🗃️ Database Design
-
-The initial database will include the following core models:
-
-| Model | Responsibility |
-|---|---|
-| LearningPath | Stores personal learning paths and descriptions |
-| Topic | Stores topics, estimated durations, and learning-path relationships |
-| Resource | Stores resource titles, types, and file paths or URLs |
-| Progress | Tracks topic completion status |
-| StudySession | Records study sessions and elapsed time |
-
-Prisma will define relationships between these models and handle database queries and migrations.
-
-SQLite is selected to keep setup simple and allow the application to work locally without a separate database server.
-
-## 🔌 Planned REST API
-
-| Method | Endpoint | Purpose |
+| Layer | Technology | Description |
 |---|---|---|
-| GET | `/api/paths` | Retrieve all learning paths |
-| POST | `/api/paths` | Create a learning path |
-| GET | `/api/paths/:id` | Retrieve a path and its topics |
-| PUT | `/api/paths/:id` | Update a learning path |
-| DELETE | `/api/paths/:id` | Delete a learning path |
-| POST | `/api/paths/:id/topics` | Add a topic |
-| PUT | `/api/topics/:id` | Update a topic |
-| DELETE | `/api/topics/:id` | Delete a topic |
-| PATCH | `/api/topics/:id/progress` | Update topic completion |
-| POST | `/api/topics/:id/resources` | Add a learning resource |
-| POST | `/api/topics/:id/sessions` | Save a study session |
-| GET | `/api/analytics/summary` | Retrieve learning analytics |
+| **Desktop Shell** | Electron 45 | Secure desktop runtime with `contextIsolation: true` & custom `preload.js` |
+| **Frontend Framework** | React 19 | Responsive component architecture with React Router 7 (`HashRouter`) |
+| **Styling** | Custom CSS / Modern Dark Theme | Modern, professional typography, card hierarchy, and responsive spacing |
+| **Icons** | Lucide React | Consistent, lightweight vector icons |
+| **Charts** | Recharts | Responsive, animated data visualizations |
+| **Backend API** | Node.js + Express.js | Modular REST API with centralized error handling |
+| **Database** | SQLite | Lightweight local relational database |
+| **ORM** | Prisma ORM 6 | Schema modeling, automated migrations, and seed scripts |
+| **Desktop Packaging**| electron-builder | Standalone native desktop distribution packaging |
 
-These endpoints describe the planned API and may change during implementation.
+---
 
-## 🚀 Development Roadmap
+## 🏗️ Architecture
 
-### Phase 1 — Project Setup
-- Set up React and Vite.
-- Configure Electron to open the application window.
-- Set up the Express backend.
-- Test communication between the frontend and backend.
+```text
+┌────────────────────────────────────────────────────────┐
+│                   Electron Desktop                      │
+│                                                        │
+│   ┌────────────────────────────────────────────────┐   │
+│   │          React 19 Frontend (Vite)              │   │
+│   │   • Dashboard        • Learning Paths          │   │
+│   │   • Topic Study      • Study Timer             │   │
+│   │   • Analytics        • Resource Library (CSV)  │   │
+│   └───────────────────────┬────────────────────────┘   │
+│                           │                             │
+│                           │ HTTP REST (Port 5001)       │
+│                           ▼                             │
+│   ┌────────────────────────────────────────────────┐   │
+│   │        Express Backend (Node.js)               │   │
+│   │   • Routes & Controllers                       │   │
+│   │   • Services & Validation                      │   │
+│   │   • Centralized Error Middleware               │   │
+│   └───────────────────────┬────────────────────────┘   │
+│                           │                             │
+│                           ▼                             │
+│   ┌────────────────────────────────────────────────┐   │
+│   │         Prisma Client (ORM)                    │   │
+│   └───────────────────────┬────────────────────────┘   │
+│                           │                             │
+│                           ▼                             │
+│   ┌────────────────────────────────────────────────┐   │
+│   │         Local SQLite Database (dev.db)         │   │
+│   │  (Packaged: Application Support/skillpath.db)   │   │
+│   └────────────────────────────────────────────────┘   │
+└────────────────────────────────────────────────────────┘
+```
 
-### Phase 2 — Database and Backend
-- Configure Prisma with SQLite.
-- Define database models and relationships.
-- Implement CRUD operations for learning paths and topics.
-- Test REST APIs using Postman.
+---
 
-### Phase 3 — Student Interface
-- Build the dashboard.
-- Create learning-path and topic pages.
-- Add forms for creating and editing learning paths.
-- Add resource management and document links.
-- Connect the interface to the Express API.
+## 🚀 Getting Started
 
-### Phase 4 — Progress Tracking
-- Implement topic completion.
-- Build the study timer.
-- Save study sessions in SQLite.
-- Calculate learning-path completion percentages.
+### Prerequisites
+- **Node.js** >= 18.x (tested on Node v24)
+- **npm** >= 9.x
 
-### Phase 5 — Analytics
-- Build simple progress charts.
-- Display study time by topic.
-- Compare estimated durations with actual study time.
-- Add dashboard summaries.
+### 1. Clone the Repository
+```bash
+git clone https://github.com/YogyeBerry/Desktop-AD-Project.git
+cd Desktop-AD-Project
+```
 
-### Phase 6 — Import and Packaging
-- Implement CSV resource import.
-- Test input validation and persistent storage.
-- Package the application using Electron.
-- Verify that data remains available after restarting the packaged application.
+### 2. Install Dependencies
+Install dependencies for the root workspace, backend, and frontend:
+```bash
+# Root dependencies (Electron, concurrently, electron-builder)
+npm install
 
-## 🔒 Security and Reliability
+# Backend dependencies (Express, Prisma, SQLite, cors, dotenv)
+cd backend && npm install && cd ..
 
-- Enable Electron's `contextIsolation`.
-- Disable `nodeIntegration` in the renderer.
-- Use a controlled preload script for required desktop capabilities.
-- Validate incoming API requests.
-- Handle invalid inputs and database errors.
-- Restrict the local Express server to localhost.
-- Store the packaged application's SQLite database in a writable application-data directory.
-- Manage the backend process through Electron's application lifecycle.
+# Frontend dependencies (React 19, Vite, Recharts, Lucide)
+cd frontend && npm install && cd ..
+```
 
-## 📦 Running the Project
+### 3. Initialize Database & Seed Sample Data
+```bash
+cd backend
+npx prisma migrate dev --name init
+npm run prisma:seed
+cd ..
+```
 
-During development, the React frontend, Express backend, and Electron desktop window will run together through configured development scripts.
+---
 
-Installation and execution commands will be documented after the project configuration is complete.
+## 💻 Running in Development
 
-The packaged application will launch its desktop interface, manage the local backend, and preserve learning data between sessions.
+### Option A: Launch Everything with One Command
+```bash
+# Starts Express backend and React frontend concurrently
+npm run dev
 
-## 🌱 Future Improvements
+# Or launch Backend, Frontend, and Electron all together:
+npm run dev:all
+```
 
-- Import Excel spreadsheets and BibTeX publication records.
-- Add resource search and filtering.
-- Introduce learning-path prerequisites and milestones.
-- Export personal learning-progress reports.
-- Add optional cloud synchronization.
-- Introduce a teacher dashboard in a future version if required.
+### Option B: Run Services Individually
+```bash
+# Terminal 1 — Backend (Port 5001)
+npm run start:backend
 
-## 🎓 Learning Outcomes
+# Terminal 2 — Frontend (Port 5173)
+npm run start:frontend
 
-This project demonstrates practical experience with:
+# Terminal 3 — Electron Desktop App
+npm run electron
+```
 
-- Desktop application development using Electron.
-- Frontend development with React and JavaScript.
-- REST API development using Node.js and Express.js.
-- Relational database design using SQL and SQLite.
-- Database modeling and migrations using Prisma ORM.
-- Data visualization and learning analytics.
-- Application architecture, input validation, and error handling.
+---
 
-## 👨‍💻 Project Status
+## 📦 Building & Packaging the Desktop Application
 
-**Status:** In Development
+The application is configured with `electron-builder` to produce an independent, standalone desktop package that launches its own backend and manages its local database in a writable OS application-data directory.
 
-SkillPath is being developed as a student-focused desktop learning application with personal learning-path management, persistent study-time tracking, and progress analytics.
+```bash
+# 1. Build frontend and generate Prisma client
+npm run build
+
+# 2. Package standalone desktop application (into dist-electron/)
+npm run pack
+
+# 3. Create platform installer / distributable
+npm run dist
+```
+
+Generated outputs appear in:
+`dist-electron/mac-arm64/SkillPath.app` (macOS) or corresponding platform targets.
+
+---
+
+## 🔌 REST API Documentation
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/` | API status and health check |
+| `GET` | `/api/paths` | List all learning paths with topics and progress |
+| `GET` | `/api/paths/:id` | Get single learning path with topics & sessions |
+| `POST` | `/api/paths` | Create a learning path `{ title, description }` |
+| `PUT` | `/api/paths/:id` | Update a learning path `{ title, description }` |
+| `DELETE` | `/api/paths/:id` | Delete learning path (cascades to topics) |
+| `POST` | `/api/paths/:id/topics` | Add topic to path `{ title, description, estimatedDuration }` |
+| `PUT` | `/api/topics/:id` | Update topic details |
+| `DELETE` | `/api/topics/:id` | Delete topic |
+| `PATCH` | `/api/topics/:id/progress` | Update topic completion `{ isCompleted: boolean }` |
+| `GET` | `/api/resources` | List all educational resources |
+| `POST` | `/api/topics/:id/resources` | Add resource to topic `{ title, type, url, filePath }` |
+| `POST` | `/api/resources/import` | Batch import resources from CSV |
+| `PUT` | `/api/resources/:id` | Update resource details |
+| `DELETE` | `/api/resources/:id` | Delete resource |
+| `GET` | `/api/sessions` | List all study sessions across topics |
+| `GET` | `/api/topics/:id/sessions` | List study sessions for a specific topic |
+| `POST` | `/api/topics/:id/sessions` | Record a completed study session `{ startTime, endTime, durationSeconds }` |
+| `GET` | `/api/analytics/summary` | Summary stats (paths, topics, completion %, total study time) |
+| `GET` | `/api/analytics/weekly` | Daily study minutes for the past 7 days |
+| `GET` | `/api/analytics/paths` | Study duration and completion metrics per path |
+| `GET` | `/api/analytics/topics` | Planned estimated vs actual study duration per topic |
+
+---
+
+## 🧪 Testing
+
+Run automated API and database integration tests:
+```bash
+npm test --prefix backend
+```
+
+Test results cover all CRUD operations, foreign key cascades, progress toggling, session logging, and analytics calculations.
+
+---
+
+## 📄 License
+ISC License. Built as an open portfolio and college project demonstration.
