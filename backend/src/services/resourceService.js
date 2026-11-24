@@ -93,6 +93,111 @@ class ResourceService {
     }
     return prisma.resource.delete({ where: { id } });
   }
+
+  async importBatch(items) {
+    if (!Array.isArray(items) || items.length === 0) {
+      const error = new Error('No items provided for import');
+      error.status = 400;
+      throw error;
+    }
+
+    let importedCount = 0;
+    let skippedCount = 0;
+    const errors = [];
+    const validTypes = ['PDF', 'DOCUMENT', 'VIDEO', 'WEBSITE'];
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      const title = item.title?.trim();
+      const pathTitle = (item.learningPath || item.learningPathTitle || 'Imported Learning Path').trim();
+      const topicTitle = (item.topic || item.topicTitle || 'General Resources').trim();
+      const rawType = (item.type || 'DOCUMENT').toUpperCase().trim();
+      const type = validTypes.includes(rawType) ? rawType : 'DOCUMENT';
+      const url = item.url?.trim() || null;
+      const filePath = item.filePath?.trim() || null;
+
+      if (!title) {
+        errors.push(`Row ${i + 1}: Missing resource title`);
+        skippedCount++;
+        continue;
+      }
+
+      try {
+        // 1. Find or create LearningPath
+        let path = await prisma.learningPath.findFirst({
+          where: { title: { equals: pathTitle } },
+        });
+        if (!path) {
+          path = await prisma.learningPath.create({
+            data: {
+              title: pathTitle,
+              description: `Learning path created from resource import`,
+            },
+          });
+        }
+
+        // 2. Find or create Topic under this path
+        let topic = await prisma.topic.findFirst({
+          where: {
+            learningPathId: path.id,
+            title: { equals: topicTitle },
+          },
+        });
+        if (!topic) {
+          const currentCount = await prisma.topic.count({ where: { learningPathId: path.id } });
+          topic = await prisma.topic.create({
+            data: {
+              title: topicTitle,
+              description: `Imported topic for ${title}`,
+              learningPathId: path.id,
+              order: currentCount + 1,
+              estimatedDuration: 30,
+              progress: { create: { isCompleted: false } },
+            },
+          });
+        }
+
+        // 3. Check for duplicates in topic
+        const duplicate = await prisma.resource.findFirst({
+          where: {
+            topicId: topic.id,
+            OR: [
+              { title: { equals: title } },
+              ...(url ? [{ url: { equals: url } }] : []),
+            ],
+          },
+        });
+
+        if (duplicate) {
+          skippedCount++;
+          continue; // skip duplicate
+        }
+
+        // 4. Create resource
+        await prisma.resource.create({
+          data: {
+            title,
+            type,
+            url,
+            filePath,
+            topicId: topic.id,
+          },
+        });
+
+        importedCount++;
+      } catch (rowErr) {
+        errors.push(`Row ${i + 1} (${title}): ${rowErr.message}`);
+        skippedCount++;
+      }
+    }
+
+    return {
+      importedCount,
+      skippedCount,
+      totalProcessed: items.length,
+      errors,
+    };
+  }
 }
 
 module.exports = new ResourceService();

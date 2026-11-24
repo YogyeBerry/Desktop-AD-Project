@@ -1,5 +1,5 @@
 const http = require('http');
-const app = require('./server');
+const app = require('../server');
 
 function request(server, path, method = 'GET', body = null) {
   return new Promise((resolve, reject) => {

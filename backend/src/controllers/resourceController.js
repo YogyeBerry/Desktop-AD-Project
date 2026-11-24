@@ -36,6 +36,15 @@ class ResourceController {
       next(err);
     }
   }
+
+  async importBatch(req, res, next) {
+    try {
+      const result = await resourceService.importBatch(req.body.resources || req.body);
+      res.status(200).json({ success: true, data: result });
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 module.exports = new ResourceController();

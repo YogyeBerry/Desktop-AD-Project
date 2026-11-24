@@ -370,6 +370,70 @@
   .activity-row time { display: none; }
   .date-pill { font-size: 10px; }
 }
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
-}
+/* --- Study Timer, CSV Import & Interactive Additions --- */
+.header-actions-row, .empty-actions-row, .topic-list-actions { display: flex; align-items: center; gap: 8px; }
+.button-sm { height: 32px; padding: 0 12px; font-size: 13px; }
+.card-top-right { display: flex; align-items: center; gap: 6px; }
+
+/* Study Timer */
+.study-timer-container { padding: 22px; margin-bottom: 20px; border: 1px solid rgba(59,130,246,0.3); background: linear-gradient(180deg, rgba(30,41,59,0.7) 0%, rgba(15,23,42,0.85) 100%); }
+.timer-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; font-size: 13px; color: #94a3b8; }
+.timer-label { display: flex; align-items: center; gap: 6px; font-weight: 600; letter-spacing: 0.05em; color: #60a5fa; }
+.timer-target strong { color: #f8fafc; margin-left: 4px; }
+.timer-display { text-align: center; padding: 18px 0; background: rgba(0,0,0,0.25); border-radius: 12px; margin-bottom: 18px; border: 1px solid rgba(255,255,255,0.05); }
+.timer-digits { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 48px; font-weight: 700; letter-spacing: 2px; color: #f8fafc; transition: color 0.3s ease; }
+.timer-digits.timer-active { color: #60a5fa; text-shadow: 0 0 18px rgba(96,165,250,0.4); }
+.timer-controls { display: flex; justify-content: center; }
+.timer-btn-lg { height: 46px; font-size: 15px; padding: 0 24px; border-radius: 10px; width: 100%; max-width: 320px; justify-content: center; }
+.timer-btn-group { display: flex; align-items: center; gap: 10px; width: 100%; max-width: 380px; justify-content: center; }
+.timer-recovery-banner { display: flex; align-items: center; gap: 8px; background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3); border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; font-size: 13px; color: #fbbf24; }
+.recovery-actions { margin-left: auto; display: flex; gap: 8px; }
+.text-btn { background: none; border: none; font-size: 12px; font-weight: 600; cursor: pointer; padding: 2px 6px; border-radius: 4px; }
+.resume-btn { color: #60a5fa; }
+.save-btn { color: #34d399; }
+.discard-btn { color: #f87171; }
+.timer-save-success { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px; background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); border-radius: 8px; color: #34d399; font-size: 13px; margin-bottom: 14px; }
+
+/* Topic Meta Stats & Study Sessions List */
+.topic-meta-stats { display: flex; gap: 20px; margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 13px; color: #94a3b8; }
+.topic-meta-item { display: flex; align-items: center; gap: 6px; }
+.topic-meta-item strong { color: #f8fafc; }
+.study-history-card { padding: 18px; margin-top: 20px; margin-bottom: 20px; }
+.study-sessions-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.study-session-item { display: flex; justify-content: space-between; align-items: center; padding: 9px 12px; background: rgba(255,255,255,0.03); border-radius: 8px; font-size: 13px; }
+.session-left { display: flex; align-items: center; gap: 8px; color: #94a3b8; }
+.session-right strong { color: #60a5fa; }
+
+/* Topic List & Row Actions */
+.topic-check-btn { background: none; border: none; padding: 0; cursor: pointer; display: flex; }
+.topic-row-actions { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.icon-button.delete-btn:hover, .icon-button.delete-res-btn:hover, .delete-res-card-btn:hover { color: #f87171; background: rgba(248,113,113,0.12); }
+.resource-actions { display: flex; align-items: center; gap: 4px; margin-left: auto; }
+
+/* CSV Import Modal */
+.csv-upload-zone { text-align: center; margin-bottom: 16px; }
+.file-input-hidden { display: none; }
+.file-dropzone { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 28px; border: 2px dashed rgba(255,255,255,0.18); border-radius: 12px; cursor: pointer; transition: all 0.2s ease; background: rgba(255,255,255,0.02); }
+.file-dropzone:hover { border-color: #60a5fa; background: rgba(96,165,250,0.05); }
+.sample-download-btn { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; font-size: 12px; color: #94a3b8; cursor: pointer; background: none; border: none; }
+.sample-download-btn:hover { color: #60a5fa; }
+.csv-error-banner { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); border-radius: 8px; color: #fca5a5; font-size: 13px; margin-bottom: 16px; }
+.csv-preview-container { margin-bottom: 16px; }
+.csv-preview-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 13px; }
+.valid-badge { font-size: 12px; color: #34d399; font-weight: 500; }
+.csv-preview-table-wrapper { max-height: 220px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; }
+.csv-preview-table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; }
+.csv-preview-table th { background: rgba(255,255,255,0.05); padding: 8px 10px; color: #94a3b8; font-weight: 600; }
+.csv-preview-table td { padding: 8px 10px; border-top: 1px solid rgba(255,255,255,0.05); }
+.row-invalid { background: rgba(239,68,68,0.08); }
+.type-pill { padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.08); font-size: 11px; font-weight: 500; }
+.status-valid { color: #34d399; display: flex; align-items: center; gap: 4px; }
+.status-error { color: #f87171; display: flex; align-items: center; gap: 4px; }
+.more-rows-note { font-size: 11px; color: #94a3b8; text-align: center; padding: 6px; }
+.import-success-view { text-align: center; padding: 30px 10px; }
+.success-icon { color: #34d399; margin: 0 auto 14px; }
+
+/* Status tags & notes */
+.sample-tag.db-tag { background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); color: #34d399; }
+.note-dot.active { background: #34d399; box-shadow: 0 0 8px rgba(52,211,153,0.5); }
+

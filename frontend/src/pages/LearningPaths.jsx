@@ -32,7 +32,7 @@ export default function LearningPaths() {
     if (searchParams.has('create')) setSearchParams({})
   }
 
-  function submitPath(event) {
+  async function submitPath(event) {
     event.preventDefault()
     const formData = new FormData(event.currentTarget)
     const updates = {
@@ -40,15 +40,23 @@ export default function LearningPaths() {
       description: String(formData.get('description')).trim(),
       estimatedMinutes: Math.max(0, Math.round(Number(formData.get('duration') || 0) * 60)),
     }
-    if (editingPath) updateLearningPath(editingPath.id, updates)
-    else createLearningPath(updates)
-    closeModal()
+    try {
+      if (editingPath) await updateLearningPath(editingPath.id, updates)
+      else await createLearningPath(updates)
+      closeModal()
+    } catch (err) {
+      alert(`Failed to save learning path: ${err.message}`)
+    }
   }
 
-  function handleDelete(path) {
+  async function handleDelete(path) {
     if (window.confirm(`Delete "${path.title}"? This will also remove its topics from your learning space.`)) {
-      deleteLearningPath(path.id)
-      setMenuPathId(null)
+      try {
+        await deleteLearningPath(path.id)
+        setMenuPathId(null)
+      } catch (err) {
+        alert(`Failed to delete learning path: ${err.message}`)
+      }
     }
   }
 

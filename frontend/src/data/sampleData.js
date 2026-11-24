@@ -66,7 +66,8 @@ export const sampleStudySessions = [
 
 export function getPathProgress(path) {
   if (!path?.topics?.length) return 0
-  return Math.round((path.topics.filter((topic) => topic.completed).length / path.topics.length) * 100)
+  const completedCount = path.topics.filter((topic) => topic.completed || topic.isCompleted).length
+  return Math.round((completedCount / path.topics.length) * 100)
 }
 
 export function getPathStatus(path) {
