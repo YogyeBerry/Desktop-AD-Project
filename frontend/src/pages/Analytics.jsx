@@ -125,20 +125,21 @@ export default function Analytics() {
             <div className="recharts-wrapper-container" style={{ width: '100%', height: 260 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={weeklyData} margin={{ top: 15, right: 15, left: -20, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                  <XAxis dataKey="day" stroke="#94a3b8" fontSize={13} tickLine={false} />
-                  <YAxis stroke="#94a3b8" fontSize={13} tickLine={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#edf2ef" />
+                  <XAxis dataKey="day" stroke="#718079" fontSize={13} tickLine={false} />
+                  <YAxis stroke="#718079" fontSize={13} tickLine={false} />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#1e293b',
-                      borderColor: '#334155',
-                      color: '#f8fafc',
+                      backgroundColor: '#ffffff',
+                      borderColor: '#e2e8f0',
+                      color: '#172b2a',
                       borderRadius: '8px',
                       fontSize: '13px',
+                      boxShadow: '0 4px 12px rgba(25, 49, 40, 0.08)',
                     }}
                     formatter={(val) => [`${val} minutes`, 'Study Time']}
                   />
-                  <Bar dataKey="minutes" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="minutes" fill="#39866b" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -163,23 +164,24 @@ export default function Analytics() {
             <div className="recharts-wrapper-container" style={{ width: '100%', height: 260 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={comparisons} margin={{ top: 15, right: 15, left: -20, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#edf2ef" />
                   <XAxis
                     dataKey="topicTitle"
-                    stroke="#94a3b8"
+                    stroke="#718079"
                     fontSize={11}
                     tickLine={false}
                     interval={0}
                     tickFormatter={(v) => (v.length > 12 ? `${v.substring(0, 10)}...` : v)}
                   />
-                  <YAxis stroke="#94a3b8" fontSize={13} tickLine={false} />
+                  <YAxis stroke="#718079" fontSize={13} tickLine={false} />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#1e293b',
-                      borderColor: '#334155',
-                      color: '#f8fafc',
+                      backgroundColor: '#ffffff',
+                      borderColor: '#e2e8f0',
+                      color: '#172b2a',
                       borderRadius: '8px',
                       fontSize: '13px',
+                      boxShadow: '0 4px 12px rgba(25, 49, 40, 0.08)',
                     }}
                     formatter={(val, name) => [`${val} min`, name === 'estimatedMinutes' ? 'Estimated' : 'Actual']}
                   />
@@ -187,8 +189,8 @@ export default function Analytics() {
                     wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }}
                     formatter={(val) => (val === 'estimatedMinutes' ? 'Estimated' : 'Actual Studied')}
                   />
-                  <Bar dataKey="estimatedMinutes" fill="#64748b" radius={[4, 4, 0, 0]} name="estimatedMinutes" />
-                  <Bar dataKey="actualMinutes" fill="#10b981" radius={[4, 4, 0, 0]} name="actualMinutes" />
+                  <Bar dataKey="estimatedMinutes" fill="#a4b3ac" radius={[4, 4, 0, 0]} name="estimatedMinutes" />
+                  <Bar dataKey="actualMinutes" fill="#2d7256" radius={[4, 4, 0, 0]} name="actualMinutes" />
                 </BarChart>
               </ResponsiveContainer>
             </div>

@@ -241,12 +241,10 @@ export default function Dashboard() {
 function StatCard({ label, value, detail, icon, color }) {
   return (
     <Card className="stat-card">
-      <div className={`stat-icon stat-icon-${color}`}>{icon}</div>
-      <div className="stat-copy">
-        <span className="stat-label">{label}</span>
-        <strong className="stat-value">{value}</strong>
-        <span className="stat-detail">{detail}</span>
-      </div>
+      <div className={`stat-icon stat-${color}`}>{icon}</div>
+      <p className="stat-label">{label}</p>
+      <div className="stat-value">{value}</div>
+      <p className="stat-detail">{detail}</p>
     </Card>
   );
 }
