@@ -6,6 +6,8 @@
     "dev": "concurrently -n \"backend,frontend\" -c \"yellow,blue\" \"npm run start:backend\" \"npm run start:frontend\"",
     "dev:all": "concurrently -n \"backend,frontend,electron\" -c \"yellow,blue,magenta\" \"npm run start:backend\" \"npm run start:frontend\" \"electron .\"",
     "electron": "electron .",
+    "electron:dev": "concurrently -n \"backend,frontend,electron\" -c \"yellow,blue,magenta\" \"npm run start:backend\" \"npm run start:frontend\" \"electron .\"",
+    "electron:start": "electron .",
     "start:frontend": "npm run dev --prefix frontend",
     "start:backend": "npm run start --prefix backend",
     "build:frontend": "npm run build --prefix frontend",
