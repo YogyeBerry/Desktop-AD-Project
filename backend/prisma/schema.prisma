@@ -1,0 +1,69 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model LearningPath {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  topics      Topic[]
+}
+
+model Topic {
+  id                String         @id @default(uuid())
+  title             String
+  description       String
+  estimatedDuration Int            @default(30)
+  order             Int            @default(0)
+  isCompleted       Boolean        @default(false)
+  learningPathId    String
+  learningPath      LearningPath   @relation(fields: [learningPathId], references: [id], onDelete: Cascade)
+  resources         Resource[]
+  studySessions     StudySession[]
+  progress          Progress?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  @@index([learningPathId])
+}
+
+model Resource {
+  id        String   @id @default(uuid())
+  title     String
+  type      String   // PDF, DOCUMENT, VIDEO, WEBSITE
+  url       String?
+  filePath  String?
+  topicId   String
+  topic     Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([topicId])
+}
+
+model StudySession {
+  id              String    @id @default(uuid())
+  topicId         String
+  topic           Topic     @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  startTime       DateTime
+  endTime         DateTime?
+  durationSeconds Int
+  createdAt       DateTime  @default(now())
+
+  @@index([topicId])
+}
+
+model Progress {
+  id          String    @id @default(uuid())
+  topicId     String    @unique
+  topic       Topic     @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  isCompleted Boolean   @default(false)
+  completedAt DateTime?
+  updatedAt   DateTime  @updatedAt
+}
