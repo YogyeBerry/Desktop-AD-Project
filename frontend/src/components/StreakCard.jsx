@@ -1,7 +1,6 @@
 import React from 'react';
-import { Flame, Trophy, Clock, CheckCircle } from 'lucide-react';
+import { Flame, Trophy, Clock3 } from 'lucide-react';
 import Card from './Card';
-import ProgressBar from './ProgressBar';
 
 export default function StreakCard({ streakData }) {
   const currentStreak = streakData?.currentStreak || 0;
@@ -16,42 +15,47 @@ export default function StreakCard({ streakData }) {
 
   return (
     <Card className="streak-card">
-      <div className="streak-card-content">
-        <div className="streak-icon-wrapper">
-          <div className={`streak-flame-circle ${currentStreak > 0 ? 'active' : ''}`}>
-            <Flame className="streak-flame-icon" size={26} />
+      <div className="streak-card-inner">
+        {/* Left: Flame and Count */}
+        <div className="streak-primary">
+          <div className={`streak-icon-pill ${currentStreak > 0 ? 'active' : ''}`}>
+            <Flame size={18} className="flame-svg" />
           </div>
-          <div className="streak-main-info">
-            <div className="streak-number-row">
-              <span className="streak-count">{currentStreak}</span>
-              <span className="streak-unit">{currentStreak === 1 ? 'day streak' : 'days streak'}</span>
+          <div className="streak-titles">
+            <div className="streak-count-row">
+              <span className="streak-number">{currentStreak}</span>
+              <span className="streak-label">{currentStreak === 1 ? 'day streak' : 'days streak'}</span>
             </div>
-            <p className="streak-subtitle">
+            <p className="streak-status">
               {todayQualified ? (
-                <span className="streak-status-met">
-                  <CheckCircle size={13} /> Target reached today (+1 streak locked!)
-                </span>
+                <span className="status-achieved">Daily goal achieved (+1 streak locked)</span>
               ) : (
-                <span>2 hrs daily target to advance streak</span>
+                <span>2 hrs daily focus target to advance streak</span>
               )}
             </p>
           </div>
         </div>
 
-        <div className="streak-stats-row">
-          <div className="streak-best-badge">
-            <Trophy size={14} className="trophy-icon" />
-            <span>Best: <strong>{longestStreak} {longestStreak === 1 ? 'day' : 'days'}</strong></span>
+        {/* Right: Progress bar & Best record */}
+        <div className="streak-metrics">
+          <div className="streak-progress-box">
+            <div className="streak-progress-header">
+              <span className="progress-title">
+                <Clock3 size={12} /> Today: {todayMinutes}m / {targetMinutes}m
+              </span>
+              <span className="progress-pct">{percentComplete}%</span>
+            </div>
+            <div className="progress-track">
+              <div
+                className="progress-fill"
+                style={{ width: `${percentComplete}%` }}
+              />
+            </div>
           </div>
 
-          <div className="streak-today-progress">
-            <div className="streak-progress-labels">
-              <span className="streak-progress-title">
-                <Clock size={12} /> Today: {todayMinutes}m / {targetMinutes}m
-              </span>
-              <span className="streak-progress-percent">{percentComplete}%</span>
-            </div>
-            <ProgressBar value={percentComplete} />
+          <div className="streak-record-badge">
+            <Trophy size={13} className="trophy-svg" />
+            <span>Best: <strong>{longestStreak} {longestStreak === 1 ? 'day' : 'days'}</strong></span>
           </div>
         </div>
       </div>

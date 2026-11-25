@@ -1,5 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
-import { Play, Pause, Square, RotateCcw, Clock, CheckCircle2, History, AlertCircle, Maximize2, Minimize2, Sparkles } from 'lucide-react';
+import {
+  Play,
+  Pause,
+  Square,
+  RotateCcw,
+  Clock,
+  CheckCircle2,
+  AlertCircle,
+  Maximize2,
+  Minimize2,
+} from 'lucide-react';
 import { formatDuration } from '../data/sampleData';
 import Button from './Button';
 import Card from './Card';
@@ -19,7 +29,12 @@ function formatTimer(ms) {
   return `${pad(minutes)}:${pad(seconds)}`;
 }
 
-export default function StudyTimer({ topicId, topicTitle = 'Focus Session', estimatedMinutes = 30, onSessionSaved }) {
+export default function StudyTimer({
+  topicId,
+  topicTitle = 'Focus Session',
+  estimatedMinutes = 30,
+  onSessionSaved,
+}) {
   const storageKey = `skillpath_timer_${topicId}`;
   const { recordTimerStart } = useLearning();
 
@@ -46,7 +61,6 @@ export default function StudyTimer({ topicId, topicTitle = 'Focus Session', esti
     }
     window.addEventListener('keydown', handleKeyDown);
 
-    // Listen to Electron IPC leave-full-screen
     let cleanupIpc = null;
     if (window.electronAPI?.onFocusModeStatusChanged) {
       cleanupIpc = window.electronAPI.onFocusModeStatusChanged((data) => {
@@ -94,7 +108,6 @@ export default function StudyTimer({ topicId, topicTitle = 'Focus Session', esti
           let calculatedElapsed = parsed.accumulatedMs || 0;
           if (parsed.timerState === 'running' && parsed.lastTick) {
             const timeSinceLastTick = Date.now() - parsed.lastTick;
-            // If reasonable time (< 24 hours), accumulate it
             if (timeSinceLastTick > 0 && timeSinceLastTick < 24 * 3600 * 1000) {
               calculatedElapsed += timeSinceLastTick;
             }
@@ -104,7 +117,7 @@ export default function StudyTimer({ topicId, topicTitle = 'Focus Session', esti
             calculatedElapsed,
           });
           setElapsedMs(calculatedElapsed);
-          setTimerState('paused'); // Pause by default so user can choose to resume or save
+          setTimerState('paused');
           sessionDataRef.current = {
             startedAt: parsed.startedAt || new Date().toISOString(),
             accumulatedMs: calculatedElapsed,
@@ -120,7 +133,7 @@ export default function StudyTimer({ topicId, topicTitle = 'Focus Session', esti
   // Timer tick loop based on timestamps
   useEffect(() => {
     if (timerState === 'running') {
-      const interval = 250; // smooth 250ms interval
+      const interval = 250;
       sessionDataRef.current.lastTick = Date.now();
 
       timerRef.current = setInterval(() => {
@@ -131,7 +144,6 @@ export default function StudyTimer({ topicId, topicTitle = 'Focus Session', esti
 
         setElapsedMs(sessionDataRef.current.accumulatedMs);
 
-        // Persist to storage
         try {
           localStorage.setItem(
             storageKey,
@@ -142,9 +154,7 @@ export default function StudyTimer({ topicId, topicTitle = 'Focus Session', esti
               lastTick: now,
             })
           );
-        } catch (e) {
-          // ignore storage quota errors
-        }
+        } catch (e) {}
       }, interval);
     } else {
       if (timerRef.current) clearInterval(timerRef.current);
@@ -167,7 +177,6 @@ export default function StudyTimer({ topicId, topicTitle = 'Focus Session', esti
     setTimerState('running');
     setSaveSuccess(false);
 
-    // Record activity timer start in backend & update global state
     try {
       if (recordTimerStart) {
         recordTimerStart();
@@ -245,7 +254,7 @@ export default function StudyTimer({ topicId, topicTitle = 'Focus Session', esti
   }
 
   function handleDiscard() {
-    if (window.confirm('Discard this study session? This time will not be recorded.')) {
+    if (window.confirm('Discard this study session? This duration will not be saved.')) {
       setTimerState('idle');
       setElapsedMs(0);
       setRecoveredSession(null);
@@ -254,91 +263,92 @@ export default function StudyTimer({ topicId, topicTitle = 'Focus Session', esti
   }
 
   return (
-    <Card className="study-timer-container">
+    <Card className="study-timer-card">
       {recoveredSession && (
-        <div className="timer-recovery-banner" role="alert">
-          <AlertCircle size={16} />
+        <div className="timer-recovery-bar" role="alert">
+          <AlertCircle size={14} />
           <span>Interrupted session recovered ({formatTimer(recoveredSession.calculatedElapsed)})</span>
           <div className="recovery-actions">
-            <button type="button" className="text-btn resume-btn" onClick={handleResume}>Resume</button>
-            <button type="button" className="text-btn save-btn" onClick={handleStopAndSave}>Save</button>
-            <button type="button" className="text-btn discard-btn" onClick={handleDiscard}>Discard</button>
+            <button type="button" className="recovery-btn" onClick={handleResume}>Resume</button>
+            <button type="button" className="recovery-btn" onClick={handleStopAndSave}>Save</button>
+            <button type="button" className="recovery-btn discard" onClick={handleDiscard}>Discard</button>
           </div>
         </div>
       )}
 
-      <div className="timer-header">
-        <div className="timer-label">
-          <Clock size={16} />
+      {/* Timer Meta Row */}
+      <div className="timer-meta-bar">
+        <div className="timer-badge">
+          <Clock size={13} />
           <span>STUDY TIMER</span>
         </div>
-        <div className="timer-top-actions">
+        <div className="timer-actions-right">
           <button
             type="button"
-            className="focus-mode-toggle-btn"
+            className="focus-trigger-btn"
             onClick={enterFocusMode}
-            title="Enter Fullscreen Focus Mode"
+            title="Enter Distraction-Free Focus Mode (Kiosk)"
           >
-            <Maximize2 size={14} />
+            <Maximize2 size={13} />
             <span>Focus Mode</span>
           </button>
-          <div className="timer-target">
-            Estimated: <strong>{formatDuration(estimatedMinutes)}</strong>
-          </div>
+          <span className="timer-estimate">
+            Target: <strong>{formatDuration(estimatedMinutes)}</strong>
+          </span>
         </div>
       </div>
 
-      <div className="timer-display">
-        <span className={`timer-digits ${timerState === 'running' ? 'timer-active' : ''}`}>
+      {/* Monospace Digits */}
+      <div className="timer-face">
+        <span className={`timer-clock-digits ${timerState === 'running' ? 'active-ticking' : ''}`}>
           {formatTimer(elapsedMs)}
         </span>
       </div>
 
       {saveSuccess && (
-        <div className="timer-save-success">
-          <CheckCircle2 size={16} />
-          <span>Study session recorded and saved to database!</span>
+        <div className="timer-success-pill">
+          <CheckCircle2 size={14} />
+          <span>Session saved to your study log</span>
         </div>
       )}
 
-      <div className="timer-controls">
+      {/* Timer Action Buttons */}
+      <div className="timer-button-row">
         {timerState === 'idle' ? (
-          <Button variant="primary" className="timer-btn-lg" onClick={handleStart}>
-            <Play size={18} fill="currentColor" /> Start Focus Session
+          <Button variant="primary" className="timer-main-btn" onClick={handleStart}>
+            <Play size={15} fill="currentColor" /> Start Focus Session
           </Button>
         ) : timerState === 'running' ? (
-          <div className="timer-btn-group">
+          <div className="timer-active-group">
             <Button variant="secondary" onClick={handlePause}>
-              <Pause size={17} /> Pause
+              <Pause size={14} /> Pause
             </Button>
             <Button variant="primary" onClick={handleStopAndSave} disabled={isSaving}>
-              <Square size={17} fill="currentColor" /> {isSaving ? 'Saving...' : 'Finish & Save'}
+              <Square size={14} fill="currentColor" /> {isSaving ? 'Saving...' : 'Finish & Save'}
             </Button>
           </div>
         ) : (
-          <div className="timer-btn-group">
+          <div className="timer-active-group">
             <Button variant="primary" onClick={handleResume}>
-              <Play size={17} fill="currentColor" /> Resume
+              <Play size={14} fill="currentColor" /> Resume
             </Button>
             <Button variant="secondary" onClick={handleStopAndSave} disabled={isSaving}>
-              <Square size={17} fill="currentColor" /> {isSaving ? 'Saving...' : 'Save & Exit'}
+              <Square size={14} fill="currentColor" /> {isSaving ? 'Saving...' : 'Save & Exit'}
             </Button>
-            <button type="button" className="button button-text" onClick={handleDiscard}>
-              <RotateCcw size={15} /> Discard
+            <button type="button" className="btn-discard" onClick={handleDiscard}>
+              <RotateCcw size={13} /> Discard
             </button>
           </div>
         )}
       </div>
 
-      {/* FULLSCREEN FOCUS MODE OVERLAY */}
+      {/* FULLSCREEN FOCUS OVERLAY */}
       {isFocusMode && (
         <div className="fullscreen-focus-overlay">
           <div className="focus-mode-backdrop" />
           <div className="focus-mode-container">
-            {/* Focus Top Bar */}
             <div className="focus-top-bar">
               <div className="focus-badge">
-                <Sparkles size={14} />
                 <span>DISTRACTION-FREE FOCUS MODE</span>
               </div>
               <button
@@ -347,59 +357,55 @@ export default function StudyTimer({ topicId, topicTitle = 'Focus Session', esti
                 onClick={exitFocusMode}
                 title="Exit Focus Mode (Esc)"
               >
-                <Minimize2 size={16} />
-                <span>Exit Focus Mode (Esc)</span>
+                <Minimize2 size={15} />
+                <span>Exit (Esc)</span>
               </button>
             </div>
 
-            {/* Topic Information */}
             <div className="focus-center-content">
               <h1 className="focus-topic-title">{topicTitle}</h1>
               <p className="focus-topic-target">
-                Target: {formatDuration(estimatedMinutes)} • Stay immersed and keep learning
+                Target: {formatDuration(estimatedMinutes)} • Quiet focus
               </p>
 
-              {/* Huge Timer Digits */}
               <div className="focus-timer-display">
                 <span className={`focus-timer-digits ${timerState === 'running' ? 'focus-timer-pulsing' : ''}`}>
                   {formatTimer(elapsedMs)}
                 </span>
               </div>
 
-              {/* Focus Timer Controls */}
               <div className="focus-controls">
                 {timerState === 'idle' ? (
                   <Button variant="primary" className="focus-btn-action" onClick={handleStart}>
-                    <Play size={20} fill="currentColor" /> Start Focus Session
+                    <Play size={18} fill="currentColor" /> Start Session
                   </Button>
                 ) : timerState === 'running' ? (
                   <div className="focus-btn-group">
                     <Button variant="secondary" className="focus-btn-action" onClick={handlePause}>
-                      <Pause size={19} /> Pause
+                      <Pause size={16} /> Pause
                     </Button>
                     <Button variant="primary" className="focus-btn-action" onClick={handleStopAndSave} disabled={isSaving}>
-                      <Square size={19} fill="currentColor" /> {isSaving ? 'Saving...' : 'Finish & Save'}
+                      <Square size={16} fill="currentColor" /> {isSaving ? 'Saving...' : 'Finish & Save'}
                     </Button>
                   </div>
                 ) : (
                   <div className="focus-btn-group">
                     <Button variant="primary" className="focus-btn-action" onClick={handleResume}>
-                      <Play size={19} fill="currentColor" /> Resume
+                      <Play size={16} fill="currentColor" /> Resume
                     </Button>
                     <Button variant="secondary" className="focus-btn-action" onClick={handleStopAndSave} disabled={isSaving}>
-                      <Square size={19} fill="currentColor" /> {isSaving ? 'Saving...' : 'Save & Exit'}
+                      <Square size={16} fill="currentColor" /> {isSaving ? 'Saving...' : 'Save & Exit'}
                     </Button>
                     <button type="button" className="focus-discard-btn" onClick={handleDiscard}>
-                      <RotateCcw size={15} /> Discard
+                      <RotateCcw size={14} /> Discard
                     </button>
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Bottom Keyboard Hint */}
             <div className="focus-bottom-hint">
-              <span>Press <strong>Esc</strong> anytime or click top right button to exit Focus Mode</span>
+              <span>Press <kbd>Esc</kbd> anytime or click the top-right button to exit Focus Mode</span>
             </div>
           </div>
         </div>

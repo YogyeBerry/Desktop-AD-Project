@@ -1,34 +1,62 @@
-import { NavLink } from 'react-router-dom'
-import { Activity, BookOpen, BookOpenCheck, LayoutDashboard, Library, Sparkles } from 'lucide-react'
+import { NavLink } from 'react-router-dom';
+import {
+  Compass,
+  BookOpen,
+  BarChart3,
+  FolderOpen,
+  CheckCircle2,
+} from 'lucide-react';
 
 const links = [
-  { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true },
-  { to: '/learning-paths', label: 'My Learning Paths', icon: BookOpen },
-  { to: '/analytics', label: 'Study Analytics', icon: Activity },
-  { to: '/resources', label: 'Resources', icon: Library },
-]
+  { to: '/', label: 'Overview', icon: Compass, end: true },
+  { to: '/learning-paths', label: 'Learning Paths', icon: BookOpen },
+  { to: '/analytics', label: 'Analytics', icon: BarChart3 },
+  { to: '/resources', label: 'Resource Library', icon: FolderOpen },
+];
 
 export default function Sidebar() {
   return (
     <aside className="sidebar">
-      <NavLink className="brand" to="/" aria-label="SkillPath dashboard">
-        <span className="brand-mark"><BookOpenCheck size={20} /></span>
-        <span><strong>SkillPath</strong><small>LEARNING SPACE</small></span>
-      </NavLink>
-      <div className="sidebar-label">WORKSPACE</div>
-      <nav className="sidebar-nav" aria-label="Main navigation">
-        {links.map(({ to, label, icon: Icon, end }) => (
-          <NavLink key={to} to={to} end={end} aria-label={label} className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>
-            <Icon size={18} strokeWidth={1.8} /><span>{label}</span>
-          </NavLink>
-        ))}
-      </nav>
-      <div className="sidebar-bottom">
-        <div className="sidebar-tip-icon"><Sparkles size={16} /></div>
-        <p className="sidebar-tip-title">Small steps add up.</p>
-        <p className="sidebar-tip-copy">A little progress each day leads to big results.</p>
-        <div className="sidebar-footer"><BookOpen size={14} /> Your space to grow</div>
+      {/* Brand Header */}
+      <div className="sidebar-header">
+        <NavLink className="brand" to="/" aria-label="SkillPath workspace">
+          <span className="brand-mark">
+            <CheckCircle2 size={16} strokeWidth={2.5} />
+          </span>
+          <div className="brand-text">
+            <strong>SkillPath</strong>
+            <span>STUDENT WORKSPACE</span>
+          </div>
+        </NavLink>
+      </div>
+
+      {/* Navigation Section */}
+      <div className="sidebar-group">
+        <span className="sidebar-group-title">WORKSPACE</span>
+        <nav className="sidebar-nav" aria-label="Workspace navigation">
+          {links.map(({ to, label, icon: Icon, end }) => (
+            <NavLink
+              key={to}
+              to={to}
+              end={end}
+              aria-label={label}
+              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+            >
+              <Icon size={16} strokeWidth={1.8} className="nav-icon" />
+              <span className="nav-label">{label}</span>
+            </NavLink>
+          ))}
+        </nav>
+      </div>
+
+      {/* Subtle Bottom macOS-style status widget */}
+      <div className="sidebar-footer-widget">
+        <div className="widget-dot" />
+        <div className="widget-content">
+          <span className="widget-title">Local SQLite Store</span>
+          <span className="widget-status">Synced & Persistent</span>
+        </div>
       </div>
     </aside>
-  )
+  );
 }
