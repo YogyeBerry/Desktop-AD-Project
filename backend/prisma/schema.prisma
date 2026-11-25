@@ -67,3 +67,14 @@ model Progress {
   completedAt DateTime?
   updatedAt   DateTime  @updatedAt
 }
+
+model DailyActivity {
+  id           String   @id @default(uuid())
+  date         String   @unique // Local calendar date in YYYY-MM-DD
+  timerStarts  Int      @default(0)
+  studySeconds Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([date])
+}
