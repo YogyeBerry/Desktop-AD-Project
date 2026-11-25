@@ -7,9 +7,11 @@ import EmptyState from '../components/EmptyState';
 import PageHeader from '../components/PageHeader';
 import ProgressBar from '../components/ProgressBar';
 import StatusBadge from '../components/StatusBadge';
+import StudyHeatmap from '../components/StudyHeatmap';
+import StreakCard from '../components/StreakCard';
 
 export default function Dashboard() {
-  const { learningPaths, studySessions, loading } = useLearning();
+  const { learningPaths, studySessions, activities, streakData, loading } = useLearning();
 
   const topics = learningPaths.flatMap((path) => path.topics || []);
   const completedTopics = topics.filter((topic) => topic.completed || topic.isCompleted).length;
@@ -61,6 +63,10 @@ export default function Dashboard() {
           color="orange"
         />
       </div>
+
+      <StreakCard streakData={streakData} />
+
+      <StudyHeatmap activities={activities} />
 
       <div className="dashboard-grid">
         <section className="section-block">

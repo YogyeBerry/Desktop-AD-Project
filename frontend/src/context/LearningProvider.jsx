@@ -5,6 +5,8 @@ import { topicService } from '../services/topicService';
 import { resourceService } from '../services/resourceService';
 import { studySessionService } from '../services/studySessionService';
 import { analyticsService } from '../services/analyticsService';
+import { activityService } from '../services/activityService';
+import { streakService } from '../services/streakService';
 
 function normalizeTopic(topic) {
   const completed = Boolean(topic.isCompleted || topic.completed);
@@ -33,6 +35,8 @@ export function LearningProvider({ children }) {
   const [resources, setResources] = useState([]);
   const [studySessions, setStudySessions] = useState([]);
   const [analytics, setAnalytics] = useState(null);
+  const [activities, setActivities] = useState([]);
+  const [streakData, setStreakData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -40,11 +44,13 @@ export function LearningProvider({ children }) {
     try {
       setLoading(true);
       setError(null);
-      const [pathsData, resData, sessData, analyticsData] = await Promise.all([
+      const [pathsData, resData, sessData, analyticsData, calendarData, streakSummary] = await Promise.all([
         pathService.getAllPaths().catch(() => []),
         resourceService.getAllResources().catch(() => []),
         studySessionService.getAllSessions().catch(() => []),
         analyticsService.getSummary().catch(() => null),
+        activityService.getCalendar(365).catch(() => ({ activities: [] })),
+        streakService.getSummary().catch(() => null),
       ]);
 
       setLearningPaths((pathsData || []).map(normalizePath));
@@ -64,6 +70,8 @@ export function LearningProvider({ children }) {
         }))
       );
       setAnalytics(analyticsData);
+      setActivities(calendarData?.activities || []);
+      setStreakData(streakSummary);
     } catch (err) {
       console.error('Failed to load learning data:', err);
       setError(err.message || 'Failed to connect to backend server');
@@ -272,6 +280,8 @@ export function LearningProvider({ children }) {
     resources,
     studySessions,
     analytics,
+    activities,
+    streakData,
     loading,
     error,
     refreshData,

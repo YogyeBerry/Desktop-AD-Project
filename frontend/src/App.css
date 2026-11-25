@@ -699,3 +699,134 @@
   from { opacity: 0; transform: translate(-50%, -90%); }
   to { opacity: 1; transform: translate(-50%, -100%); }
 }
+
+/* ==========================================================================
+   STREAK CARD STYLES
+   ========================================================================== */
+
+.streak-card {
+  margin-top: 24px;
+  padding: 20px 24px;
+  background: linear-gradient(135deg, #ffffff 0%, #f7faf8 100%);
+  border-radius: 14px;
+  border: 1px solid #dce8e1;
+  box-shadow: 0 3px 12px rgba(27, 48, 38, 0.05);
+}
+
+.streak-card-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.streak-icon-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.streak-flame-circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #f0f4f2;
+  color: #8c9e96;
+  transition: all 0.25s ease;
+}
+
+.streak-flame-circle.active {
+  background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%);
+  color: #ea580c;
+  box-shadow: 0 4px 14px rgba(234, 88, 12, 0.25);
+  animation: pulseFlame 2.4s infinite ease-in-out;
+}
+
+@keyframes pulseFlame {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+
+.streak-number-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.streak-count {
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+  color: #172b22;
+  font-family: 'Manrope', sans-serif;
+}
+
+.streak-unit {
+  font-size: 14px;
+  font-weight: 600;
+  color: #556b61;
+}
+
+.streak-subtitle {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: #72867d;
+}
+
+.streak-status-met {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #166534;
+  font-weight: 600;
+}
+
+.streak-stats-row {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+
+.streak-best-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: #f1f6f3;
+  color: #3b5046;
+  font-size: 12px;
+  border: 1px solid #e1ebe5;
+}
+
+.trophy-icon {
+  color: #ca8a04;
+}
+
+.streak-today-progress {
+  min-width: 200px;
+}
+
+.streak-progress-labels {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11.5px;
+  color: #5c7066;
+  margin-bottom: 6px;
+}
+
+.streak-progress-title {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.streak-progress-percent {
+  font-weight: 700;
+  color: #244436;
+}
