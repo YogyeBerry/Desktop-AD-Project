@@ -147,16 +147,16 @@ async function runTests() {
 
     // 14b. Activity & Streak Endpoints
     const actStart = await request(server, '/api/activity/start', 'POST', { date: '2026-11-26' });
-    console.assert(actStart.status === 200 && actStart.body.timerStarts >= 1, 'POST /api/activity/start failed');
+    console.assert(actStart.status === 200 && actStart.body.data.timerStarts >= 1, 'POST /api/activity/start failed');
     console.log('✔ Activity timer start recording endpoint OK');
 
     const calendar = await request(server, '/api/activity/calendar?days=30');
-    console.assert(calendar.status === 200 && Array.isArray(calendar.body.activities), 'GET /api/activity/calendar failed');
-    console.log(`✔ Activity calendar endpoint OK (${calendar.body.activities.length} days recorded)`);
+    console.assert(calendar.status === 200 && Array.isArray(calendar.body.data.activities), 'GET /api/activity/calendar failed');
+    console.log(`✔ Activity calendar endpoint OK (${calendar.body.data.activities.length} days recorded)`);
 
     const streakRes = await request(server, '/api/streak/summary?today=2026-11-26');
-    console.assert(streakRes.status === 200 && streakRes.body.targetSeconds === 7200, 'GET /api/streak/summary failed');
-    console.log(`✔ Streak summary endpoint OK (current: ${streakRes.body.currentStreak}, best: ${streakRes.body.longestStreak})`);
+    console.assert(streakRes.status === 200 && streakRes.body.data.targetSeconds === 7200, 'GET /api/streak/summary failed');
+    console.log(`✔ Streak summary endpoint OK (current: ${streakRes.body.data.currentStreak}, best: ${streakRes.body.data.longestStreak})`);
 
     // 15. DELETE endpoints
     res = await request(server, `/api/resources/${resourceId}`, 'DELETE');

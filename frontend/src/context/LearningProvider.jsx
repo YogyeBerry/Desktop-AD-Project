@@ -258,6 +258,26 @@ export function LearningProvider({ children }) {
     }
   }
 
+  // Record a timer start and optimistically update activities in state
+  async function recordTimerStart(dateStr) {
+    try {
+      const res = await activityService.recordStart(dateStr);
+      if (res) {
+        setActivities((prev) => {
+          const targetDate = res.date;
+          const existing = prev.find((a) => a.date === targetDate);
+          if (existing) {
+            return prev.map((a) => (a.date === targetDate ? { ...a, timerStarts: res.timerStarts } : a));
+          }
+          return [...prev, res];
+        });
+      }
+      return res;
+    } catch (err) {
+      console.warn('Could not record timer start:', err);
+    }
+  }
+
   // Study Session Operation
   async function recordStudySession(topicId, sessionData) {
     try {
@@ -268,6 +288,23 @@ export function LearningProvider({ children }) {
         durationMinutes: Math.round((created.durationSeconds || 0) / 60),
       };
       setStudySessions((prev) => [normalizedSession, ...prev]);
+
+      // Refresh calendar & streak data so heatmap and streak update immediately
+      try {
+        const [calendarData, streakSummary] = await Promise.all([
+          activityService.getCalendar(365).catch(() => null),
+          streakService.getSummary().catch(() => null),
+        ]);
+        if (calendarData?.activities) {
+          setActivities(calendarData.activities);
+        }
+        if (streakSummary) {
+          setStreakData(streakSummary);
+        }
+      } catch (e) {
+        console.warn('Could not refresh activity/streak:', e);
+      }
+
       return normalizedSession;
     } catch (err) {
       setError(err.message);
@@ -285,6 +322,7 @@ export function LearningProvider({ children }) {
     loading,
     error,
     refreshData,
+    recordTimerStart,
     createLearningPath,
     updateLearningPath,
     deleteLearningPath,

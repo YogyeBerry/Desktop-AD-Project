@@ -4,6 +4,7 @@ import { formatDuration } from '../data/sampleData';
 import Button from './Button';
 import Card from './Card';
 import activityService from '../services/activityService';
+import { useLearning } from '../context/useLearning';
 
 function formatTimer(ms) {
   const totalSeconds = Math.floor(ms / 1000);
@@ -20,6 +21,7 @@ function formatTimer(ms) {
 
 export default function StudyTimer({ topicId, topicTitle = 'Focus Session', estimatedMinutes = 30, onSessionSaved }) {
   const storageKey = `skillpath_timer_${topicId}`;
+  const { recordTimerStart } = useLearning();
 
   const [timerState, setTimerState] = useState('idle'); // 'idle' | 'running' | 'paused'
   const [elapsedMs, setElapsedMs] = useState(0);
@@ -165,11 +167,15 @@ export default function StudyTimer({ topicId, topicTitle = 'Focus Session', esti
     setTimerState('running');
     setSaveSuccess(false);
 
-    // Record activity timer start in backend
+    // Record activity timer start in backend & update global state
     try {
-      activityService.recordStart().catch((err) => {
-        console.warn('Could not record activity start:', err);
-      });
+      if (recordTimerStart) {
+        recordTimerStart();
+      } else {
+        activityService.recordStart().catch((err) => {
+          console.warn('Could not record activity start:', err);
+        });
+      }
     } catch (e) {}
 
     try {
