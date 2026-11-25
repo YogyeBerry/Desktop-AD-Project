@@ -1,4 +1,59 @@
 const prisma = require('../db/prisma');
+const activityService = require('./activityService');
+
+/**
+ * Split a duration across calendar days if a session spans midnight
+ * Returns array of { date: 'YYYY-MM-DD', seconds: number }
+ */
+function splitSessionDurationByDays(startDate, endDate, totalSeconds) {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const totalMs = Math.max(1000, end.getTime() - start.getTime());
+
+  // If start and end are on the same local calendar day
+  const startDayStr = activityService.toLocalDateString(start);
+  const endDayStr = activityService.toLocalDateString(end);
+
+  if (startDayStr === endDayStr) {
+    return [{ date: startDayStr, seconds: totalSeconds }];
+  }
+
+  // Iterate day by day from start to end
+  const splits = [];
+  let currentStart = new Date(start);
+  let remainingSeconds = totalSeconds;
+
+  while (currentStart < end) {
+    const currentDateStr = activityService.toLocalDateString(currentStart);
+    // End of current local day: next day at 00:00:00.000
+    const nextDay = new Date(currentStart);
+    nextDay.setDate(nextDay.getDate() + 1);
+    nextDay.setHours(0, 0, 0, 0);
+
+    const sliceEnd = nextDay < end ? nextDay : end;
+    const sliceMs = sliceEnd.getTime() - currentStart.getTime();
+
+    // Proportional seconds
+    let sliceSeconds = Math.round((sliceMs / totalMs) * totalSeconds);
+    if (sliceSeconds > remainingSeconds) {
+      sliceSeconds = remainingSeconds;
+    }
+
+    if (sliceSeconds > 0) {
+      splits.push({ date: currentDateStr, seconds: sliceSeconds });
+      remainingSeconds -= sliceSeconds;
+    }
+
+    currentStart = sliceEnd;
+  }
+
+  // If any rounding remainder, give to the last split
+  if (remainingSeconds > 0 && splits.length > 0) {
+    splits[splits.length - 1].seconds += remainingSeconds;
+  }
+
+  return splits;
+}
 
 class StudySessionService {
   async getSessionsByTopic(topicId) {
@@ -49,7 +104,8 @@ class StudySessionService {
       throw error;
     }
 
-    return prisma.studySession.create({
+    // 1. Save study session
+    const session = await prisma.studySession.create({
       data: {
         topicId,
         startTime: start,
@@ -69,7 +125,20 @@ class StudySessionService {
         },
       },
     });
+
+    // 2. Allocate duration across calendar days for heatmap and streak tracking
+    try {
+      const splits = splitSessionDurationByDays(start, end, duration);
+      for (const split of splits) {
+        await activityService.addStudyDuration(split.date, split.seconds);
+      }
+    } catch (actErr) {
+      console.error('Failed to update daily activity duration:', actErr);
+    }
+
+    return session;
   }
 }
 
 module.exports = new StudySessionService();
+module.exports.splitSessionDurationByDays = splitSessionDurationByDays;

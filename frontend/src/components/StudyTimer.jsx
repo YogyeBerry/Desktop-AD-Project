@@ -3,6 +3,7 @@ import { Play, Pause, Square, RotateCcw, Clock, CheckCircle2, History, AlertCirc
 import { formatDuration } from '../data/sampleData';
 import Button from './Button';
 import Card from './Card';
+import activityService from '../services/activityService';
 
 function formatTimer(ms) {
   const totalSeconds = Math.floor(ms / 1000);
@@ -115,6 +116,13 @@ export default function StudyTimer({ topicId, estimatedMinutes = 30, onSessionSa
     setElapsedMs(0);
     setTimerState('running');
     setSaveSuccess(false);
+
+    // Record activity timer start in backend
+    try {
+      activityService.recordStart().catch((err) => {
+        console.warn('Could not record activity start:', err);
+      });
+    } catch (e) {}
 
     try {
       localStorage.setItem(
