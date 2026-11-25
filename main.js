@@ -1,9 +1,10 @@
-const { app, BrowserWindow, shell } = require('electron');
+const { app, BrowserWindow, shell, ipcMain } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
 let mainWindow = null;
 let serverInstance = null;
+let savedWindowState = null;
 
 const isDev = !app.isPackaged && process.env.NODE_ENV !== 'production';
 
@@ -115,7 +116,70 @@ function createWindow() {
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
+
+  // Handle user exiting fullscreen natively (e.g. macOS green button or Escape)
+  mainWindow.on('leave-full-screen', () => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('focus-mode:status-changed', { isFocusMode: false });
+    }
+  });
 }
+
+// IPC Handlers for Fullscreen / Focus Mode
+ipcMain.handle('focus-mode:enter', async (_event, options = {}) => {
+  if (!mainWindow || mainWindow.isDestroyed()) return { success: false, error: 'No active window' };
+
+  try {
+    // Preserve window state before entering focus/kiosk
+    savedWindowState = {
+      isFullScreen: mainWindow.isFullScreen(),
+      isKiosk: mainWindow.isKiosk(),
+      bounds: mainWindow.getBounds(),
+    };
+
+    // If requested, set kiosk mode (especially on Windows/Linux; on macOS fullscreen is standard)
+    if (options.useKiosk) {
+      mainWindow.setKiosk(true);
+    } else {
+      mainWindow.setFullScreen(true);
+    }
+
+    return { success: true, isFullScreen: true, isKiosk: mainWindow.isKiosk() };
+  } catch (err) {
+    console.error('[Electron] Error entering focus mode:', err);
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle('focus-mode:exit', async () => {
+  if (!mainWindow || mainWindow.isDestroyed()) return { success: false, error: 'No active window' };
+
+  try {
+    // Disable kiosk mode first if enabled
+    if (mainWindow.isKiosk()) {
+      mainWindow.setKiosk(false);
+    }
+
+    // Exit fullscreen if active
+    if (mainWindow.isFullScreen()) {
+      mainWindow.setFullScreen(false);
+    }
+
+    // Restore previous bounds if saved and not maximized
+    if (savedWindowState && savedWindowState.bounds) {
+      mainWindow.setBounds(savedWindowState.bounds);
+    }
+    savedWindowState = null;
+
+    // Notify renderer that focus mode exited
+    mainWindow.webContents.send('focus-mode:status-changed', { isFocusMode: false });
+
+    return { success: true };
+  } catch (err) {
+    console.error('[Electron] Error exiting focus mode:', err);
+    return { success: false, error: err.message };
+  }
+});
 
 app.whenReady().then(async () => {
   try {

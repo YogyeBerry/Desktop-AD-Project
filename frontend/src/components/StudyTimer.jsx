@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Play, Pause, Square, RotateCcw, Clock, CheckCircle2, History, AlertCircle } from 'lucide-react';
+import { Play, Pause, Square, RotateCcw, Clock, CheckCircle2, History, AlertCircle, Maximize2, Minimize2, Sparkles } from 'lucide-react';
 import { formatDuration } from '../data/sampleData';
 import Button from './Button';
 import Card from './Card';
@@ -18,7 +18,7 @@ function formatTimer(ms) {
   return `${pad(minutes)}:${pad(seconds)}`;
 }
 
-export default function StudyTimer({ topicId, estimatedMinutes = 30, onSessionSaved }) {
+export default function StudyTimer({ topicId, topicTitle = 'Focus Session', estimatedMinutes = 30, onSessionSaved }) {
   const storageKey = `skillpath_timer_${topicId}`;
 
   const [timerState, setTimerState] = useState('idle'); // 'idle' | 'running' | 'paused'
@@ -26,6 +26,7 @@ export default function StudyTimer({ topicId, estimatedMinutes = 30, onSessionSa
   const [recoveredSession, setRecoveredSession] = useState(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isFocusMode, setIsFocusMode] = useState(false);
 
   const timerRef = useRef(null);
   const sessionDataRef = useRef({
@@ -33,6 +34,53 @@ export default function StudyTimer({ topicId, estimatedMinutes = 30, onSessionSa
     accumulatedMs: 0,
     lastTick: null,
   });
+
+  // Listen to native fullscreen/focus-mode exit events and Escape key
+  useEffect(() => {
+    function handleKeyDown(e) {
+      if (e.key === 'Escape' && isFocusMode) {
+        exitFocusMode();
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown);
+
+    // Listen to Electron IPC leave-full-screen
+    let cleanupIpc = null;
+    if (window.electronAPI?.onFocusModeStatusChanged) {
+      cleanupIpc = window.electronAPI.onFocusModeStatusChanged((data) => {
+        if (!data.isFocusMode) {
+          setIsFocusMode(false);
+        }
+      });
+    }
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      if (cleanupIpc) cleanupIpc();
+    };
+  }, [isFocusMode]);
+
+  async function enterFocusMode() {
+    setIsFocusMode(true);
+    if (window.electronAPI?.enterFocusMode) {
+      try {
+        await window.electronAPI.enterFocusMode({ useKiosk: false });
+      } catch (e) {
+        console.warn('Native focus mode trigger failed:', e);
+      }
+    }
+  }
+
+  async function exitFocusMode() {
+    setIsFocusMode(false);
+    if (window.electronAPI?.exitFocusMode) {
+      try {
+        await window.electronAPI.exitFocusMode();
+      } catch (e) {
+        console.warn('Native exit focus mode failed:', e);
+      }
+    }
+  }
 
   // Check for saved / interrupted timer session on mount
   useEffect(() => {
@@ -179,6 +227,9 @@ export default function StudyTimer({ topicId, estimatedMinutes = 30, onSessionSa
       setRecoveredSession(null);
       setSaveSuccess(true);
       localStorage.removeItem(storageKey);
+      if (isFocusMode) {
+        await exitFocusMode();
+      }
       setTimeout(() => setSaveSuccess(false), 4000);
     } catch (err) {
       alert(`Failed to save study session: ${err.message}`);
@@ -215,8 +266,19 @@ export default function StudyTimer({ topicId, estimatedMinutes = 30, onSessionSa
           <Clock size={16} />
           <span>STUDY TIMER</span>
         </div>
-        <div className="timer-target">
-          Estimated: <strong>{formatDuration(estimatedMinutes)}</strong>
+        <div className="timer-top-actions">
+          <button
+            type="button"
+            className="focus-mode-toggle-btn"
+            onClick={enterFocusMode}
+            title="Enter Fullscreen Focus Mode"
+          >
+            <Maximize2 size={14} />
+            <span>Focus Mode</span>
+          </button>
+          <div className="timer-target">
+            Estimated: <strong>{formatDuration(estimatedMinutes)}</strong>
+          </div>
         </div>
       </div>
 
@@ -261,6 +323,81 @@ export default function StudyTimer({ topicId, estimatedMinutes = 30, onSessionSa
           </div>
         )}
       </div>
+
+      {/* FULLSCREEN FOCUS MODE OVERLAY */}
+      {isFocusMode && (
+        <div className="fullscreen-focus-overlay">
+          <div className="focus-mode-backdrop" />
+          <div className="focus-mode-container">
+            {/* Focus Top Bar */}
+            <div className="focus-top-bar">
+              <div className="focus-badge">
+                <Sparkles size={14} />
+                <span>DISTRACTION-FREE FOCUS MODE</span>
+              </div>
+              <button
+                type="button"
+                className="focus-exit-btn"
+                onClick={exitFocusMode}
+                title="Exit Focus Mode (Esc)"
+              >
+                <Minimize2 size={16} />
+                <span>Exit Focus Mode (Esc)</span>
+              </button>
+            </div>
+
+            {/* Topic Information */}
+            <div className="focus-center-content">
+              <h1 className="focus-topic-title">{topicTitle}</h1>
+              <p className="focus-topic-target">
+                Target: {formatDuration(estimatedMinutes)} • Stay immersed and keep learning
+              </p>
+
+              {/* Huge Timer Digits */}
+              <div className="focus-timer-display">
+                <span className={`focus-timer-digits ${timerState === 'running' ? 'focus-timer-pulsing' : ''}`}>
+                  {formatTimer(elapsedMs)}
+                </span>
+              </div>
+
+              {/* Focus Timer Controls */}
+              <div className="focus-controls">
+                {timerState === 'idle' ? (
+                  <Button variant="primary" className="focus-btn-action" onClick={handleStart}>
+                    <Play size={20} fill="currentColor" /> Start Focus Session
+                  </Button>
+                ) : timerState === 'running' ? (
+                  <div className="focus-btn-group">
+                    <Button variant="secondary" className="focus-btn-action" onClick={handlePause}>
+                      <Pause size={19} /> Pause
+                    </Button>
+                    <Button variant="primary" className="focus-btn-action" onClick={handleStopAndSave} disabled={isSaving}>
+                      <Square size={19} fill="currentColor" /> {isSaving ? 'Saving...' : 'Finish & Save'}
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="focus-btn-group">
+                    <Button variant="primary" className="focus-btn-action" onClick={handleResume}>
+                      <Play size={19} fill="currentColor" /> Resume
+                    </Button>
+                    <Button variant="secondary" className="focus-btn-action" onClick={handleStopAndSave} disabled={isSaving}>
+                      <Square size={19} fill="currentColor" /> {isSaving ? 'Saving...' : 'Save & Exit'}
+                    </Button>
+                    <button type="button" className="focus-discard-btn" onClick={handleDiscard}>
+                      <RotateCcw size={15} /> Discard
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Bottom Keyboard Hint */}
+            <div className="focus-bottom-hint">
+              <span>Press <strong>Esc</strong> anytime or click top right button to exit Focus Mode</span>
+            </div>
+          </div>
+        </div>
+      )}
     </Card>
   );
 }
