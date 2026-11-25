@@ -134,17 +134,24 @@ ipcMain.handle('focus-mode:enter', async (_event, options = {}) => {
     savedWindowState = {
       isFullScreen: mainWindow.isFullScreen(),
       isKiosk: mainWindow.isKiosk(),
+      isAlwaysOnTop: mainWindow.isAlwaysOnTop(),
       bounds: mainWindow.getBounds(),
     };
 
-    // If requested, set kiosk mode (especially on Windows/Linux; on macOS fullscreen is standard)
-    if (options.useKiosk) {
-      mainWindow.setKiosk(true);
-    } else {
-      mainWindow.setFullScreen(true);
-    }
+    // 1. Enable Kiosk mode (locks OS menu bars, mission control, taskbars)
+    mainWindow.setKiosk(true);
 
-    return { success: true, isFullScreen: true, isKiosk: mainWindow.isKiosk() };
+    // 2. Enable Fullscreen mode
+    mainWindow.setFullScreen(true);
+
+    // 3. Keep window pinned on top so user cannot switch or hide behind other windows
+    // On macOS: 'screen-saver' level ensures window stays in front of other apps
+    mainWindow.setAlwaysOnTop(true, 'screen-saver');
+
+    // 4. Force focus
+    mainWindow.focus();
+
+    return { success: true, isFullScreen: true, isKiosk: true };
   } catch (err) {
     console.error('[Electron] Error entering focus mode:', err);
     return { success: false, error: err.message };
@@ -155,7 +162,10 @@ ipcMain.handle('focus-mode:exit', async () => {
   if (!mainWindow || mainWindow.isDestroyed()) return { success: false, error: 'No active window' };
 
   try {
-    // Disable kiosk mode first if enabled
+    // Release always-on-top window lock
+    mainWindow.setAlwaysOnTop(false);
+
+    // Disable kiosk mode
     if (mainWindow.isKiosk()) {
       mainWindow.setKiosk(false);
     }

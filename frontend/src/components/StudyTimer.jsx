@@ -64,7 +64,7 @@ export default function StudyTimer({ topicId, topicTitle = 'Focus Session', esti
     setIsFocusMode(true);
     if (window.electronAPI?.enterFocusMode) {
       try {
-        await window.electronAPI.enterFocusMode({ useKiosk: false });
+        await window.electronAPI.enterFocusMode({ useKiosk: true });
       } catch (e) {
         console.warn('Native focus mode trigger failed:', e);
       }
