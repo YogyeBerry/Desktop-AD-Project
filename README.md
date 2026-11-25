@@ -41,6 +41,24 @@ SkillPath is a student-only desktop application built with **Electron, React 19,
 - **Time by Learning Path**: Distribution of attention across different subjects.
 - **Path Completion Summary**: Overall goal attainment percentages calculated dynamically from SQLite.
 
+### 7. 🟩 GitHub-Style Study Activity Heatmap
+- **52-Week Rolling Calendar Grid**: Visualizes study habits over 365 days with weekday (Mon, Wed, Fri) and month indicators.
+- **Dynamic Intensity Tiers**: Scaled based on daily timer starts (0 = empty, 1 = light green, 2–3 = medium-light, 4–6 = medium, 7+ = deep forest green).
+- **Interactive Tooltip**: Hovering over any cell reveals exact calendar date, session count, and total accumulated duration.
+- **Midnight & Multi-Topic Aggregation**: Timer starts across any topic contribute to the unified daily count.
+
+### 8. 🔥 Daily Study Streak System
+- **2-Hour Daily Qualification Engine**: Day streak advances (+1) only upon accumulating $\ge$ 2 hours (7,200 seconds) of actual study time across one or multiple sessions.
+- **Longest vs. Current Streak**: Consecutive qualifying days increment streak; missed days reset current streak while forever preserving the student's personal record.
+- **Dashboard Streak Card**: Prominently features an animated flame badge, best streak trophy, and real-time daily progress bar (`Xm / 120m`).
+- **Midnight Proportional Splitting**: Late-night sessions crossing 00:00 automatically split elapsed study seconds into their respective calendar days.
+
+### 9. 🔲 Fullscreen Focus Mode (Electron Kiosk / Fullscreen)
+- **Distraction-Free Environment**: Hides all navigation bars, sidebars, and peripheral UI into an immersive focus screen.
+- **High-Visibility Timer**: Displays topic title, estimated goal, and massive monospace timer digits with subtle ambient pulse.
+- **Unified Timer Engine**: Seamlessly shares active timer state, pause/resume, and finish controls with the standard study view.
+- **Safe Exit Architecture**: Built with native Electron IPC, bound to the `Escape` key and top exit button to guarantee the user is never trapped.
+
 ---
 
 ## 🛠️ Technology Stack
