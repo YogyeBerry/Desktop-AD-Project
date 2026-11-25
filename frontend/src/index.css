@@ -1,61 +1,46 @@
 :root {
-  /* Typography: System font stack favored by Apple, Linear, Things 3 */
+  /* System Typography */
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   letter-spacing: -0.011em;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  /* Color Palette - Premium Warm Minimalist (Linear & Things 3 inspired) */
-  --bg-app: #fbfbf9;             /* Warm paper off-white */
-  --bg-sidebar: #f5f5f2;         /* Distinct, calm secondary background */
-  --bg-card: #ffffff;            /* Pure clean card surface */
-  --bg-card-subtle: #fafaf8;     /* Inset panels & subtle zones */
-  --bg-hover: #f1f1ee;           /* Light neutral hover state */
-  --bg-active: #e9e9e5;          /* Pressed / selected indicator */
+  /* Clean, Pure Minimal Desktop Palette */
+  --bg-app: #fbfbf9;             /* Warm calm off-white */
+  --bg-sidebar: #f5f5f2;         /* Slightly distinct sidebar rail */
+  --bg-card: #ffffff;            /* Crisp white cards */
+  --bg-card-subtle: #fafaf8;     /* Inset surfaces */
+  --bg-hover: #f1f1ed;           /* Interaction hover */
 
-  /* Text hierarchy */
-  --text-primary: #191c1a;       /* Deep warm charcoal, not harsh pure black */
-  --text-secondary: #5f6661;     /* Muted reading copy */
-  --text-tertiary: #8a948e;      /* Micro-copy, metadata, placeholders */
-  --text-quaternary: #b2bbb6;    /* Icons, inactive indicators, subtle dots */
+  /* Text Hierarchy */
+  --text-primary: #191c1a;       /* Charcoal, high contrast readable */
+  --text-secondary: #5a635e;     /* Body reading text */
+  --text-tertiary: #88928c;      /* Metadata, micro-labels */
+  --text-quaternary: #b5beb8;    /* Dividers, inactive icons */
 
-  /* Brand / Signature Accent - Muted Sage Emerald */
-  --accent: #2e664f;             /* Refined deep botanical green */
-  --accent-hover: #24523f;
-  --accent-light: #ebf3ef;       /* Subtle wash for selected pills & badges */
-  --accent-border: #bcd5c8;
+  /* Accent: Clean, Muted Sage-Green */
+  --accent: #2e664f;
+  --accent-hover: #23523f;
+  --accent-light: #edf5f0;
+  --accent-border: #c3dcce;
 
-  /* Semantic feedback */
-  --success: #2e664f;
-  --success-bg: #ebf3ef;
-  --warning: #b45309;
-  --warning-bg: #fffbeb;
-  --danger: #b91c1c;
-  --danger-bg: #fef2f2;
+  /* Subtle Borders */
+  --border-subtle: #ecece7;
+  --border-medium: #dfdfd8;
+  --border-strong: #c7c7be;
 
-  /* Borders & Dividers */
-  --border-subtle: #eeeee9;      /* Ultra subtle divider */
-  --border-medium: #e2e2dc;      /* Card edges & input borders */
-  --border-strong: #c8c8c0;
+  /* Soft Ambient Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.04);
+  --shadow-modal: 0 16px 40px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.05);
 
-  /* Shadows - Barely perceptible, natural ambient lighting */
-  --shadow-sm: 0 1px 2px rgba(18, 22, 20, 0.03);
-  --shadow-md: 0 4px 12px rgba(18, 22, 20, 0.04), 0 1px 3px rgba(18, 22, 20, 0.02);
-  --shadow-lg: 0 12px 32px rgba(18, 22, 20, 0.07), 0 2px 6px rgba(18, 22, 20, 0.03);
-  --shadow-modal: 0 20px 48px -8px rgba(18, 22, 20, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.04);
-
-  /* Corner Radii - Modern Apple/macOS curve standards */
+  /* Radius standards */
   --radius-xs: 4px;
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 14px;
-  --radius-xl: 18px;
-
-  /* Focus ring */
-  --focus-ring: 0 0 0 2px #fff, 0 0 0 4px #2e664f;
 }
 
 * {
@@ -77,10 +62,6 @@ button, input, textarea, select {
   color: inherit;
 }
 
-button, a {
-  -webkit-tap-highlight-color: transparent;
-}
-
 a {
   color: inherit;
   text-decoration: none;
@@ -92,11 +73,11 @@ a {
 }
 
 :focus-visible {
-  outline: none;
-  box-shadow: var(--focus-ring);
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
-/* Custom minimal scrollbar */
+/* Minimal Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -120,6 +101,5 @@ a {
   margin: -1px;
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
   border: 0;
 }
